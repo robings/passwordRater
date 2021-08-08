@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace passwordRater.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
+    [ApiController]
     public class PasswordRaterController : ControllerBase
     {
         [HttpPost]
