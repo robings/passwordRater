@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -7,7 +11,36 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+form {
+  border: 1px solid #999999;
+  border-radius: 0.25em;
+  padding: 5px;
+  margin: 5px;
+  width: fit-content;
+}
+
+input {
+  border: 1px solid #000000;
+  height: 25px;
+  padding: 2px;
+  margin-left: 5px;
+}
+
+button {
+  height: 28px;
+  padding: 5px;
+  margin-left: 5px;
+  border-radius: 0.25em;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.error {
+  background-color: #FF0000;
+  color: #FFFFFF;
+  border-radius: 0.25em;
+  margin-top: 5px;
+  padding: 5px;
 }
