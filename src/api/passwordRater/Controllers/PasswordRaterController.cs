@@ -18,6 +18,12 @@ namespace passwordRater.Controllers
             return Ok(passwordRating);
         }
 
+        [HttpOptions]
+        public ActionResult Options()
+        {
+            return Ok();
+        }
+
         public int RatePassword(string password)
         {
             var dodgyPasswordComponents = new string[]

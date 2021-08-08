@@ -24,23 +24,59 @@ input {
   height: 25px;
   padding: 2px;
   margin-left: 5px;
+  outline: none;
 }
 
-button {
+input[type="password"] {
+  width: 300px;
+}
+
+input[type="submit"] {
   height: 28px;
   padding: 5px;
   margin-left: 5px;
   border-radius: 0.25em;
 }
 
-button:hover {
+input[type="submit"]:hover {
   cursor: pointer;
+}
+
+input[type="submit"]:disabled {
+  cursor: default;
+}
+
+.message {
+  border-radius: 0.25em;
+  margin-top: 5px;
+  padding: 5px;
 }
 
 .error {
   background-color: #FF0000;
   color: #FFFFFF;
-  border-radius: 0.25em;
-  margin-top: 5px;
-  padding: 5px;
+}
+
+.redLight {
+  background-color: #ff00007a;
+  color: #FFFFFF;
+  border: 1px solid #FF0000;
+}
+
+.warning {
+  background-color: #ffbb007a;
+  color: #FFFFFF;
+  border: 1px solid #ffbb00;
+}
+
+.lightWarning {
+  background-color: #ff88007a;
+  color: #FFFFFF;
+  border: 1px solid #ff8800;
+}
+
+.greenLight {
+  background-color: #01aa017a;
+  color: #FFFFFF;
+  border: 1px solid #01aa01;
 }

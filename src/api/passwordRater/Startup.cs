@@ -18,6 +18,13 @@ namespace passwordRater
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                builder.WithOrigins(Configuration.GetValue<string>("AllowedOrigins"))
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+            });
             services.AddControllers();
         }
 
@@ -30,12 +37,7 @@ namespace passwordRater
             }
 
             app.UseRouting();
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins(Configuration.GetValue<string>("AllowedOrigins"));
-                builder.AllowAnyHeader();
-                builder.AllowAnyMethod();
-            });
+            app.UseCors();
 
             app.UseHttpsRedirection();
 

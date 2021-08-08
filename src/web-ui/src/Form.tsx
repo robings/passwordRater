@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 
 function Form(): JSX.Element {
     const [ currentPassword, setCurrentPassword ] = useState<string>("");
     const [ error, setError ] = useState<string>("");
+    const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
+
 
     const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (error !== "") {
@@ -11,13 +13,14 @@ function Form(): JSX.Element {
 
         setCurrentPassword(e.target.value);
 
-        if (e.target.value.toLowerCase() === "password") {
-            setError("Don't use password as a password!");
-        }
-
         if (currentPassword !== "") {
-            await postPasswordForEvaluation(currentPassword);
+            postPasswordForEvaluation(e.target.value);
         }
+    }
+
+    const handleSubmit = (e: FormEvent) => {
+        alert(`Password Submitted was ${currentPassword}`);
+        e.preventDefault();
     }
 
     async function postPasswordForEvaluation(password: string) {
@@ -34,7 +37,33 @@ function Form(): JSX.Element {
 
             if (response.status !== 200) {
                 setError("Error validating password.")
-            }    
+                return;
+            }
+
+            const result: number = await response.json();
+            let resultAsText: string;
+            let resultClassName: string;
+
+            switch(result){
+                case 1:
+                    resultAsText = "Meh";
+                    resultClassName = "warning";
+                    break;
+                case 2:
+                    resultAsText = "Good";
+                    resultClassName = "lightWarning";
+                    break;
+                case 3:
+                    resultAsText = "Excellent";
+                    resultClassName = "greenLight";
+                    break;
+                default:
+                    resultAsText = "Weak";
+                    resultClassName = "redLight";
+                    break;
+            }
+
+            setRating({ text: resultAsText, className: resultClassName});
         }
         catch {
             setError("Error validating password.")
@@ -42,12 +71,12 @@ function Form(): JSX.Element {
       }
 
     return (
-        <form>
-            <label htmlFor="password">Enter a password</label>
-            <input type="text" name="password" id ="password" onChange={handleInputChange} />
-            <button>Submit</button>
-            <div>{currentPassword}</div>
-            {error && <div className="error">{error}</div>}
+        <form onSubmit={handleSubmit}>
+            <label htmlFor="passwordInput">Enter a password</label>
+            <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handleInputChange} />
+            <input type="submit" disabled={ rating.text==='' || rating.text === 'Weak'} value="Submit" />
+            {rating && <div className={'message ' + rating.className}>{rating.text}</div>}
+            {error && <div className="message error">{error}</div>}
         </form>
     );
 }
