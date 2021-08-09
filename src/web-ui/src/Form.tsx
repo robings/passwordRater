@@ -1,29 +1,12 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useState, useEffect, useCallback } from 'react';
+import debounce from 'lodash.debounce'
 
 function Form(): JSX.Element {
     const [ currentPassword, setCurrentPassword ] = useState<string>("");
     const [ error, setError ] = useState<string>("");
     const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
 
-
-    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (error !== "") {
-            setError("");
-        }
-
-        setCurrentPassword(e.target.value);
-
-        if (currentPassword !== "") {
-            postPasswordForEvaluation(e.target.value);
-        }
-    }
-
-    const handleSubmit = (e: FormEvent) => {
-        alert(`Password Submitted was ${currentPassword}`);
-        e.preventDefault();
-    }
-
-    async function postPasswordForEvaluation(password: string) {
+    const postPasswordForEvaluation = async () => {
         let response: Response;
         try{
             response = await fetch("https://localhost:5000/PasswordRater", {
@@ -32,7 +15,7 @@ function Form(): JSX.Element {
                     'Content-Type': 'application/problem+json',
                     'Origin': 'http://localhost:3000'
                 },
-                body: JSON.stringify({ password: password })
+                body: JSON.stringify({ password: currentPassword })
             });
 
             if (response.status !== 200) {
@@ -69,6 +52,29 @@ function Form(): JSX.Element {
             setError("Error validating password.")
         }
       }
+
+    const delayedPasswordEvaluation = useCallback(debounce(postPasswordForEvaluation, 500), [currentPassword])
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (error !== "") {
+            setError("");
+        }
+
+        setCurrentPassword(e.target.value);
+    }
+
+    useEffect(() => {
+        if (currentPassword !== "") {
+            delayedPasswordEvaluation();
+        }
+
+        return delayedPasswordEvaluation.cancel;
+    }, [currentPassword, delayedPasswordEvaluation])
+
+    const handleSubmit = (e: FormEvent) => {
+        alert(`Password Submitted was ${currentPassword}`);
+        e.preventDefault();
+    }
 
     return (
         <form onSubmit={handleSubmit}>
