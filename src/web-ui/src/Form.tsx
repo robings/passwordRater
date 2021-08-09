@@ -1,4 +1,4 @@
-import React, { FormEvent, useState, useEffect, useCallback } from 'react';
+import React, { FormEvent, useState, useEffect, useCallback, useMemo } from 'react';
 import debounce from 'lodash.debounce'
 
 function Form(): JSX.Element {
@@ -6,7 +6,7 @@ function Form(): JSX.Element {
     const [ error, setError ] = useState<string>("");
     const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
 
-    const postPasswordForEvaluation = async () => {
+    const postPasswordForEvaluation = useCallback(async () => {
         let response: Response;
         try{
             response = await fetch("https://localhost:5000/PasswordRater", {
@@ -51,9 +51,9 @@ function Form(): JSX.Element {
         catch {
             setError("Error validating password.")
         }
-      }
+      }, [currentPassword]);
 
-    const delayedPasswordEvaluation = useCallback(debounce(postPasswordForEvaluation, 500), [currentPassword])
+    const delayedPasswordEvaluation = useMemo(() => debounce(() => postPasswordForEvaluation(), 500), [postPasswordForEvaluation])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (error !== "") {
