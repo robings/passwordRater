@@ -1,61 +1,54 @@
 import React, { FormEvent, useState, useEffect, useCallback, useMemo } from 'react';
-import debounce from 'lodash.debounce'
+import debounce from 'lodash.debounce';
+import apiCall from './apiCall';
+import { DebouncedFunc } from 'lodash';
 
 function Form(): JSX.Element {
     const [ currentPassword, setCurrentPassword ] = useState<string>("");
     const [ error, setError ] = useState<string>("");
     const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
 
-    const postPasswordForEvaluation = useCallback(async () => {
-        let response: Response;
-        try{
-            response = await fetch("https://localhost:5000/PasswordRater", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/problem+json',
-                    'Origin': 'http://localhost:3000'
-                },
-                body: JSON.stringify({ password: currentPassword })
-            });
+    const processResult = (result: number): { text: string, className: string } => {
+        let resultAsText: string;
+        let resultClassName: string;
 
-            if (response.status !== 200) {
-                setError("Error validating password.")
-                return;
-            }
-
-            const result: number = await response.json();
-            let resultAsText: string;
-            let resultClassName: string;
-
-            switch(result){
-                case 1:
-                    resultAsText = "Meh";
-                    resultClassName = "warning";
-                    break;
-                case 2:
-                    resultAsText = "Good";
-                    resultClassName = "lightWarning";
-                    break;
-                case 3:
-                    resultAsText = "Excellent";
-                    resultClassName = "greenLight";
-                    break;
-                default:
-                    resultAsText = "Weak";
-                    resultClassName = "redLight";
-                    break;
-            }
-
-            setRating({ text: resultAsText, className: resultClassName});
+        switch(result){
+            case 1:
+                resultAsText = "Meh";
+                resultClassName = "warning";
+                break;
+            case 2:
+                resultAsText = "Good";
+                resultClassName = "lightWarning";
+                break;
+            case 3:
+                resultAsText = "Excellent";
+                resultClassName = "greenLight";
+                break;
+            default:
+                resultAsText = "Weak";
+                resultClassName = "redLight";
+                break;
         }
-        catch {
-            setError("Error validating password.")
-        }
-      }, [currentPassword]);
 
-    const delayedPasswordEvaluation = useMemo(() => debounce(() => postPasswordForEvaluation(), 500), [postPasswordForEvaluation])
+        return { text: resultAsText, className: resultClassName };
+    }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const postPasswordForEvaluation: () => Promise<void> = useCallback(async (): Promise<void> => {
+        await apiCall(currentPassword).then(response => {
+            return response.json();
+        }).then(data => {
+            setRating(processResult(data));
+        }).catch(() => {
+            setError("Error validating password.");
+            setRating({ text: "", className: ""});
+        })
+    }, [currentPassword]);
+
+    const delayedPasswordEvaluation = useMemo<DebouncedFunc<() => Promise<void>>>(
+        () => debounce(() => postPasswordForEvaluation(), 500), [postPasswordForEvaluation])
+
+    const handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void = (e) => {
         if (error !== "") {
             setError("");
         }
@@ -71,7 +64,7 @@ function Form(): JSX.Element {
         return delayedPasswordEvaluation.cancel;
     }, [currentPassword, delayedPasswordEvaluation])
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit:(e: FormEvent) => void = (e) => {
         alert(`Password Submitted was ${currentPassword}`);
         e.preventDefault();
     }
@@ -81,7 +74,7 @@ function Form(): JSX.Element {
             <label htmlFor="passwordInput">Enter a password</label>
             <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handleInputChange} />
             <input type="submit" disabled={ rating.text==='' || rating.text === 'Weak'} value="Submit" />
-            {rating && <div className={'message ' + rating.className}>{rating.text}</div>}
+            {rating.text !== "" && <div className={'message ' + rating.className}>{rating.text}</div>}
             {error && <div className="message error">{error}</div>}
         </form>
     );
