@@ -35,9 +35,7 @@ function Form(): JSX.Element {
     }
 
     const postPasswordForEvaluation: () => Promise<void> = useCallback(async (): Promise<void> => {
-        await apiCall(currentPassword).then(response => {
-            return response.json();
-        }).then(data => {
+        await apiCall(currentPassword).then(data => {
             setRating(processResult(data));
         }).catch(() => {
             setError("Error validating password.");

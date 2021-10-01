@@ -1,4 +1,4 @@
-export default async function apiCall(password: string): Promise<Response> {
+export default async function apiCall(password: string): Promise<number> {
     return await fetch("http://localhost:5000/PasswordRater", {
         method: 'POST',
         headers: {
@@ -6,5 +6,7 @@ export default async function apiCall(password: string): Promise<Response> {
             'Origin': 'http://localhost:3000'
         },
         body: JSON.stringify({ password: password })
-    });
+    }).then((response) => {
+        return response.json()
+    })
 }
