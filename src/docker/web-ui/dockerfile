@@ -1,0 +1,11 @@
+FROM node:14-alpine as dependencies
+WORKDIR /web
+
+COPY ./web-ui/package.json ./
+RUN npm set progress=false && npm config set depth 0
+RUN npm install
+
+FROM dependencies as RUN
+HEALTHCHECK --interval=5m --timeout=3s \
+    CMD curl -f http://localhost:3000/ || exit 1
+ENTRYPOINT ["sh", "-c", "npm start"]

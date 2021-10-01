@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0 as build
+WORKDIR /build
+COPY ./api/passwordRater/ ./passwordRater/
+COPY ./api/passwordRater.Tests/*.csproj ./passwordRater.Tests/
+COPY ./api/*.sln ./
+RUN dotnet publish "./passwordRater/passwordRater.csproj" -c release -o "./out"
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 as final
+WORKDIR /app
+COPY --from=build /build/out/ ./
+ENV ASPNETCORE_ENVIRONMENT=Development
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "passwordRater.dll", "--urls", "http://0.0.0.0:5000"]

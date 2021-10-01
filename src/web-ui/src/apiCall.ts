@@ -1,5 +1,5 @@
 export default async function apiCall(password: string): Promise<Response> {
-    return await fetch("https://localhost:5000/PasswordRater", {
+    return await fetch("http://localhost:5000/PasswordRater", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/problem+json',
