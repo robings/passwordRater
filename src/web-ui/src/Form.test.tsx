@@ -13,10 +13,11 @@ describe('on initial page load', () => {
         expect(passwordInput).toBeInTheDocument();
     });
 
-    test('displays reenter password input box', () => {
+    test('displays reenter password input box, which is disabled', () => {
         render(<Form />);
         const passwordInput = screen.getByLabelText("Reenter password");
         expect(passwordInput).toBeInTheDocument();
+        expect(passwordInput).toBeDisabled();
     });
 
     
@@ -39,7 +40,7 @@ describe('on initial page load', () => {
 })
 
 describe('rating display', () => {
-    test('when 0 rating received shows weak password text, with disabled Submit button', async () => {
+    test('when 0 rating received shows weak password text', async () => {
         (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.resolve(0));
 
         render(<Form />);
@@ -48,9 +49,8 @@ describe('rating display', () => {
         userEvent.type(passwordInput, 'hello'); // needed to trigger the mocked function
 
         expect(await screen.findByText(/Weak/i)).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Submit" })).toBeDisabled();
     })
-    test('when 1 rating received shows meh password text, with enabled Submit button', async () => {
+    test('when 1 rating received shows meh password text', async () => {
         (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.resolve(1));
 
         render(<Form />);
@@ -59,9 +59,8 @@ describe('rating display', () => {
         userEvent.type(passwordInput, 'hello'); // needed to trigger the mocked function
 
         expect(await screen.findByText(/Meh/i)).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Submit" })).toBeEnabled();
     })
-    test('when 2 rating received shows good password text, with enabled Submit button', async () => {
+    test('when 2 rating received shows good password text', async () => {
         (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.resolve(2));
 
         render(<Form />);
@@ -70,9 +69,8 @@ describe('rating display', () => {
         userEvent.type(passwordInput, 'hello'); // needed to trigger the mocked function
 
         expect(await screen.findByText(/Good/i)).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Submit" })).toBeEnabled();
     })
-    test('when 3 rating received shows excellent password text, with enabled Submit button', async () => {
+    test('when 3 rating received shows excellent password text', async () => {
         (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.resolve(3));
 
         render(<Form />);
@@ -81,7 +79,6 @@ describe('rating display', () => {
         userEvent.type(passwordInput, 'hello'); // needed to trigger the mocked function
 
         expect(await screen.findByText(/Excellent/i)).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Submit" })).toBeEnabled();
     })
 })
 
@@ -133,4 +130,7 @@ describe('password input', () => {
         expect(screen.queryByText('Excellent')).not.toBeInTheDocument(); // deleting the text needs to reset.
         expect(screen.getByRole("button", { name: "Submit" })).toBeDisabled();
     })
+})
+
+describe('password reentry input', () => {
 })

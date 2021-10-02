@@ -5,7 +5,8 @@ import { DebouncedFunc } from 'lodash';
 
 function Form(): JSX.Element {
     const [ currentPassword, setCurrentPassword ] = useState<string>("");
-    const [ currentReenteredPassword, setCurrentReenteredPassword ] = useState<string>("");
+    const [ currentReenteredPassword ] = useState<string>("");
+    const [ disableSubmit ] = useState<boolean>(true);
     const [ error, setError ] = useState<string>("");
     const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
 
@@ -47,7 +48,7 @@ function Form(): JSX.Element {
     const delayedPasswordEvaluation = useMemo<DebouncedFunc<() => Promise<void>>>(
         () => debounce(() => postPasswordForEvaluation(), 500), [postPasswordForEvaluation])
 
-    const handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void = (e) => {
+    const handlePasswordInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void = (e) => {
         if (error !== "") {
             setError("");
         }
@@ -73,11 +74,11 @@ function Form(): JSX.Element {
     return (
         <form onSubmit={handleSubmit}>
             <label htmlFor="passwordInput">Enter a password</label>
-            <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handleInputChange} />
+            <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handlePasswordInputChange} />
             {rating.text !== "" && <div className={'message ' + rating.className}>Rating: {rating.text}</div>}
             <label htmlFor="reenterPasswordInput">Reenter password</label>
-            <input type="password" name="reenterPasswordInput" id ="reenterPasswordInput" value={currentReenteredPassword} onChange={handleInputChange} />
-            <input type="submit" disabled={ rating.text==='' || rating.text === 'Weak'} value="Submit" />
+            <input type="password" disabled={ rating.text==='' || rating.text === 'Weak'} name="reenterPasswordInput" id ="reenterPasswordInput" value={currentReenteredPassword} />
+            <input type="submit" disabled={ disableSubmit } value="Submit" />
             {error && <div className="message error">{error}</div>}
         </form>
     );
