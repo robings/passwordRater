@@ -17,14 +17,19 @@ form {
   padding: 5px;
   margin: 5px;
   width: fit-content;
+  overflow: auto;
 }
 
 input {
   border: 1px solid #000000;
   height: 25px;
   padding: 2px;
-  margin-left: 5px;
+  margin: 10px 0 10px 5px;
   outline: none;
+}
+
+.inputGroup {
+  text-align: right;
 }
 
 input[type="password"] {
@@ -32,18 +37,27 @@ input[type="password"] {
 }
 
 input[type="submit"] {
-  height: 28px;
-  padding: 5px;
+  height: 32px;
+  padding: 7px 15px;
   margin-left: 5px;
   border-radius: 0.25em;
+  float: right;
+  cursor: pointer;
+  color: #01aa01;
+  background-color: #01aa017a;
+  border-color: #01aa01;
 }
 
 input[type="submit"]:hover {
-  cursor: pointer;
+  background-color: #01aa0157;
+  color: #ffffff;
 }
 
 input[type="submit"]:disabled {
   cursor: default;
+  background-color: inherit;
+  color: #999999;
+  border-color: inherit;
 }
 
 .message {

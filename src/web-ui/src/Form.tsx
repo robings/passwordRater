@@ -5,8 +5,8 @@ import { DebouncedFunc } from 'lodash';
 
 function Form(): JSX.Element {
     const [ currentPassword, setCurrentPassword ] = useState<string>("");
-    const [ currentReenteredPassword ] = useState<string>("");
-    const [ disableSubmit ] = useState<boolean>(true);
+    const [ currentReenteredPassword, setCurrentReenteredPassword ] = useState<string>("");
+    const [ disableSubmit, setDisableSubmit ] = useState<boolean>(true);
     const [ error, setError ] = useState<string>("");
     const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
 
@@ -54,6 +54,29 @@ function Form(): JSX.Element {
         }
 
         setCurrentPassword(e.target.value);
+
+        determineSubmitButtonState(e.target.value, currentReenteredPassword);
+    }
+
+    const handleReenteredPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void = (e) => {
+        if (error !== "") {
+            setError("");
+        }
+
+        setCurrentReenteredPassword(e.target.value);
+
+        determineSubmitButtonState(currentPassword, e.target.value);
+    }
+
+    const determineSubmitButtonState: (currentPassword: string, currentReenteredPassword: string) => void = (currentPassword, currentReenteredPassword) => {
+        if (
+            (currentPassword && currentReenteredPassword) &&
+            currentPassword === currentReenteredPassword
+        ) {
+            setDisableSubmit(false);
+        } else if (disableSubmit === false) {
+            setDisableSubmit(true);
+        }
     }
 
     useEffect(() => {
@@ -73,11 +96,15 @@ function Form(): JSX.Element {
 
     return (
         <form onSubmit={handleSubmit}>
-            <label htmlFor="passwordInput">Enter a password</label>
-            <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handlePasswordInputChange} />
+            <div className="inputGroup">
+                <label htmlFor="passwordInput">Enter a password</label>
+                <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handlePasswordInputChange} />
+            </div>
             {rating.text !== "" && <div className={'message ' + rating.className}>Rating: {rating.text}</div>}
-            <label htmlFor="reenterPasswordInput">Reenter password</label>
-            <input type="password" disabled={ rating.text==='' || rating.text === 'Weak'} name="reenterPasswordInput" id ="reenterPasswordInput" value={currentReenteredPassword} />
+            <div className="inputGroup">
+                <label htmlFor="reenterPasswordInput">Reenter password</label>
+                <input type="password" disabled={ rating.text==='' || rating.text === 'Weak'} name="reenterPasswordInput" id ="reenterPasswordInput" value={currentReenteredPassword} onChange={handleReenteredPasswordChange} />
+            </div>
             <input type="submit" disabled={ disableSubmit } value="Submit" />
             {error && <div className="message error">{error}</div>}
         </form>

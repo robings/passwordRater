@@ -133,4 +133,90 @@ describe('password input', () => {
 })
 
 describe('password reentry input', () => {
+    test('api response of 0 keeps input disabled', async () => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockReturnValueOnce(Promise.resolve(0)); // needed to enable password reentry input.
+        
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        userEvent.type(passwordInput, 'hello');
+
+        await screen.findByText(/Weak/i); // wait for debounced function to fire so screen is updated with response.
+
+        expect(screen.getByLabelText("Reenter password")).toBeDisabled();
+    })
+
+    const enablingResponses = [ 1, 2, 3 ];
+
+    test.each(enablingResponses)('api response other than 0 enables input', async (enablingReponse) => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockReturnValueOnce(Promise.resolve(enablingReponse)); // needed to enable password reentry input.
+        
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        userEvent.type(passwordInput, 'hello1234!@£$');
+
+        await screen.findByText(/Rating/i); // wait for debounced function to fire so screen is updated with enabled reenter password input.
+
+        expect(screen.getByLabelText("Reenter password")).toBeEnabled();
+    })
+
+    test('typing same password in enabled input enables submit button', async () => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockReturnValueOnce(Promise.resolve(3)); // needed to enable password reentry input.
+        
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        const textToType = "hello";
+
+        userEvent.type(passwordInput, textToType);
+
+        await screen.findByText(/Rating/i); // wait for debounced function to fire so screen is updated with enabled reenter password input.
+    
+        const passwordReentryInput = screen.getByLabelText("Reenter password");
+
+        userEvent.type(passwordReentryInput, textToType);
+
+        expect(screen.getByRole('button', { name: 'Submit'})).toBeEnabled();
+    })
+
+    test('typing same password in enabled input, then deleting text disables Submit button again', async () => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockReturnValueOnce(Promise.resolve(3)); // needed to enable password reentry input.
+        
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        const textToType = "hello";
+
+        userEvent.type(passwordInput, textToType);
+
+        await screen.findByText(/Rating/i); // wait for debounced function to fire so screen is updated with enabled reenter password input.
+    
+        const passwordReentryInput = screen.getByLabelText("Reenter password");
+
+        userEvent.type(passwordReentryInput, textToType);
+        userEvent.type(passwordReentryInput, '{backspace}{backspace}');
+
+        expect(screen.getByRole('button', { name: 'Submit'})).toBeDisabled();
+    })
+
+    test('typing same password in enabled input, then deleting text from password input disables Submit button again', async () => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockReturnValueOnce(Promise.resolve(3)); // needed to enable password reentry input.
+        
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        const textToType = "hello";
+
+        userEvent.type(passwordInput, textToType);
+
+        await screen.findByText(/Rating/i); // wait for debounced function to fire so screen is updated with enabled reenter password input.
+    
+        const passwordReentryInput = screen.getByLabelText("Reenter password");
+
+        userEvent.type(passwordReentryInput, textToType);
+        userEvent.type(passwordInput, '{backspace}{backspace}');
+
+        expect(screen.getByRole('button', { name: 'Submit'})).toBeDisabled();
+    })
 })
