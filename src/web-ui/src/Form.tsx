@@ -5,6 +5,7 @@ import { DebouncedFunc } from 'lodash';
 
 function Form(): JSX.Element {
     const [ currentPassword, setCurrentPassword ] = useState<string>("");
+    const [ currentReenteredPassword, setCurrentReenteredPassword ] = useState<string>("");
     const [ error, setError ] = useState<string>("");
     const [ rating, setRating ] = useState<{ text: string, className: string }>({ text: "", className: ""});
 
@@ -57,6 +58,8 @@ function Form(): JSX.Element {
     useEffect(() => {
         if (currentPassword !== "") {
             delayedPasswordEvaluation();
+        } else {
+            setRating({ text: "", className: ""});
         }
 
         return delayedPasswordEvaluation.cancel;
@@ -71,8 +74,10 @@ function Form(): JSX.Element {
         <form onSubmit={handleSubmit}>
             <label htmlFor="passwordInput">Enter a password</label>
             <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handleInputChange} />
+            {rating.text !== "" && <div className={'message ' + rating.className}>Rating: {rating.text}</div>}
+            <label htmlFor="reenterPasswordInput">Reenter password</label>
+            <input type="password" name="reenterPasswordInput" id ="reenterPasswordInput" value={currentReenteredPassword} onChange={handleInputChange} />
             <input type="submit" disabled={ rating.text==='' || rating.text === 'Weak'} value="Submit" />
-            {rating.text !== "" && <div className={'message ' + rating.className}>{rating.text}</div>}
             {error && <div className="message error">{error}</div>}
         </form>
     );
