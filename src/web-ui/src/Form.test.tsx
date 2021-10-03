@@ -7,6 +7,11 @@ import userEvent from '@testing-library/user-event';
 jest.mock('./apiCall');
 
 describe('on initial page load', () => {
+    test('displays title', () => {
+        render(<Form />);
+        expect(screen.getByText("Create Password")).toBeInTheDocument();
+    })
+
     test('displays password input box', () => {
         render(<Form />);
         const passwordInput = screen.getByLabelText("Enter a password");
@@ -40,6 +45,28 @@ describe('on initial page load', () => {
 })
 
 describe('rating display', () => {
+    test('when error received from api, shows error text', async() => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.reject());
+
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        userEvent.type(passwordInput, 'hello'); // needed to trigger the mocked function
+
+        expect(await screen.findByText('Error validating password.')).toBeInTheDocument();
+    })
+
+    test('when response received from api, does not show error text', async() => {
+        (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.resolve(0));
+
+        render(<Form />);
+
+        const passwordInput = screen.getByLabelText("Enter a password");
+        userEvent.type(passwordInput, 'hello'); // needed to trigger the mocked function
+
+        expect(screen.queryByText('Error validating password.')).not.toBeInTheDocument();
+    })
+
     test('when 0 rating received shows weak password text', async () => {
         (apiCall as jest.MockedFunction<typeof apiCall>).mockImplementation(() => Promise.resolve(0));
 

@@ -96,6 +96,7 @@ function Form(): JSX.Element {
 
     return (
         <form onSubmit={handleSubmit}>
+            <h1>Create Password</h1>
             <div className="inputGroup">
                 <label htmlFor="passwordInput">Enter a password</label>
                 <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handlePasswordInputChange} />
