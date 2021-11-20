@@ -97,6 +97,7 @@ function Form(): JSX.Element {
     return (
         <form onSubmit={handleSubmit}>
             <h1>Create Password</h1>
+            {error && <div className="message error">{error}</div>}
             <div className="inputGroup">
                 <label htmlFor="passwordInput">Enter a password</label>
                 <input className={rating.className} type="password" name="passwordInput" id ="passwordInput" value={currentPassword} onChange={handlePasswordInputChange} />
@@ -107,7 +108,6 @@ function Form(): JSX.Element {
                 <input type="password" disabled={ rating.text==='' || rating.text === 'Weak'} name="reenterPasswordInput" id ="reenterPasswordInput" value={currentReenteredPassword} onChange={handleReenteredPasswordChange} />
             </div>
             <input type="submit" disabled={ disableSubmit } value="Submit" />
-            {error && <div className="message error">{error}</div>}
         </form>
     );
 }
